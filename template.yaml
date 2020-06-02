@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Teste do nestjs com lambda"
+
+Globals:
+  Function:
+    Timeout: 60
+    Environment:
+      Variables:
+        RUNTIME_ENVIRONMENT: 'serverless'
+
+Api:
+  Type: 'AWS::ApiGateway::RestApi'
+  Properties:
+    Name: TestNestApi
+
+Resource:
+  Type: 'AWS::ApiGateway::Resource'
+  ParentId: !GetAtt Api.TestNestApi
+  RestApiId: !Ref Api
+  PathPart: '{proxy+}'
+
+Resources:
+  EntryPointResourceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/main.handler
+      Runtime: nodejs12.x
+      Events:
+        EntryPointResource:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+        BaseResource:
+          Type: Api
+          Properties:
+            Path: /
+            Method: any
+            
+            
+
